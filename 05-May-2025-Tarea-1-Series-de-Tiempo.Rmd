@@ -1,0 +1,54 @@
+---
+title: "05 May 2025 - Tarea 1 Series de Tiempo"
+author: "Salvador Narvaez A00571848"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+![](C:\Users\chava\OneDrive\Escritorio\usa.jpg)
+
+# Librerías
+```{r}
+library(readr)
+library(dplyr)
+library(forecast)
+```
+
+# Cargar archivo
+```{r}
+data <- read.csv("C:/Users/chava/OneDrive/Escritorio/datos_usa.csv")
+
+
+head(data)
+```
+# Crear las series de tiempo y aplicar logaritmo
+```{r}
+LGCP <- log(data$GDP)
+LIPD <- log(data$PDI)
+LUE <- log(data$PROFITS)
+LDIVIDENDOS <- log(data$DIVIDENDS)
+```
+
+# Convertir en objetos de serie de tiempo trimestrales (1970 Q1 a 1991 Q4)
+```{r}
+ts_LGCP <- ts(LGCP, start = c(1970, 1), frequency = 4)
+ts_LIPD <- ts(LIPD, start = c(1970, 1), frequency = 4)
+ts_LUE <- ts(LUE, start = c(1970, 1), frequency = 4)
+ts_LDIVIDENDOS <- ts(LDIVIDENDOS, start = c(1970, 1), frequency = 4)
+```
+
+# Graficar los correlogramas (ACF) hasta 36 rezagos
+```{r}
+par(mfrow = c(2,2)) # Para poner 4 gráficos en una sola pantalla
+
+acf(ts_LGCP, lag.max = 36, main = "Correlograma de LGCP (PIB)")
+acf(ts_LIPD, lag.max = 36, main = "Correlograma de LIPD (Ingreso Disp.)")
+acf(ts_LUE, lag.max = 36, main = "Correlograma de LUE (Utilidades)")
+acf(ts_LDIVIDENDOS, lag.max = 36, main = "Correlograma de LDIVIDENDOS")
+```
+
+# Interpretación y conclusiones
+
+Al examinar las correlaciones muestrales de las series de tiempo económicas de Estados Unidos, que incluyen LGCP (PIB), LIPD (Ingreso Disponible), LUE (Utilidades Empresariales) y LDIVIDENDOS hasta 36 rezagos, se percibe un patrón general bastante parecido entre todos: las autocorrelaciones disminuyen de forma gradual y progresiva a medida que se incrementan los rezagos, lo que insinúa una estrecha relación entre los valores presentes y pasados. Este comportamiento es común en series no estacionarias, dado que no se percibe un descenso brusco a cero ni una rápida estabilización en las bandas de confianza; por el contrario, los valores de la función de autocorrelación se mantienen altos durante largos periodos, algo frecuente que pasa en los procesos con raíz unitaria, como una caminata aleatoria con deriva. 
+
+Por lo tanto, basándonos únicamente en la intuición al observar la forma de los correlogramas, podemos afirmar que ninguna de estas series parece ser estacionaria en su forma inicial, dado que todas exhiben una persistencia notable en sus rezagos.En resumen, podemos concluir que las cuatro series probablemente requieren ser transformadas, ya que el patrón común dentro de las cuatro es la desaceleración lenta en las autocorrelaciones. Por ejemplo, aquí lo que podríamos hacer es, mediante diferenciación, analizarlas bajo los modelos que asumen esta estacionariedad, como los modelos ARIMA.
